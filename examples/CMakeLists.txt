@@ -1,0 +1,7 @@
+add_executable(numth numth.cpp)
+target_link_libraries(numth PRIVATE asan ubsan algo)
+target_include_directories(numth PRIVATE ../include)
+
+add_executable(sequence sequence.cpp)
+target_link_libraries(sequence PRIVATE asan ubsan algo)
+target_include_directories(sequence PRIVATE ../include)
