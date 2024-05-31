@@ -9,7 +9,9 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
+#include <variant>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -37,6 +39,8 @@ template <typename T>
 void print(std::complex<T> value) {
     std::cout << value.real() << '+' << value.imag() << 'i';
 }
+
+void print(std::monostate) {}
 
 template <class T>
 void print(T const* value) {
@@ -71,35 +75,42 @@ template <class Rng> requires std::ranges::range<Rng>
 struct RangeFormat {
     static const char obracket = '[';
     static const char cbracket = ']';
-    static constexpr std::string separator = ", ";
+    static inline const std::string separator = ", ";
 };
 
 template <class T>
 struct RangeFormat<std::set<T>> {
     static const char obracket = '{';
     static const char cbracket = '}';
-    static constexpr std::string separator = ", ";
+    static inline const std::string separator = ", ";
 };
 
 template <class Key, class T>
 struct RangeFormat<std::map<Key, T>> {
     static const char obracket = '{';
     static const char cbracket = '}';
-    static constexpr std::string separator = ", ";
+    static inline const std::string separator = ", ";
 };
 
 template <class Rng> requires std::ranges::range<Rng>
-void print(Rng&& rng) {
-    std::cout << RangeFormat<Rng>::obracket;
+void print_range(Rng&& rng) {
+    using Fmt = RangeFormat<std::decay_t<Rng>>;
     if (std::cbegin(rng) == std::cend(rng)) {
         return;
     }
     print(*std::cbegin(rng));
     for (auto it = std::next(std::cbegin(rng)); it != std::cend(rng); ++it) {
-        std::cout << RangeFormat<Rng>::separator; 
+        std::cout << Fmt::separator; 
         print(*it); 
     }
-    std::cout << RangeFormat<Rng>::cbracket;
+}
+
+template <class Rng> requires std::ranges::range<Rng>
+void print(Rng&& rng) {
+    using Fmt = RangeFormat<std::decay_t<Rng>>;
+    std::cout << Fmt::obracket;
+    print_range(std::forward<Rng>(rng));
+    std::cout << Fmt::cbracket;
 }
 
 template <class T>
@@ -121,7 +132,7 @@ template <class ...Args>
 void debug_impl(std::string const& funcname, size_t line, Args&&... args) {
     std::cout << ANSI_COLOR_YELLOW;
     std::cout << "[DEBUG at " << funcname << ':' << line << "]\n";
-    std::cout << ANSI_COLOR_BLUE;
+    std::cout << ANSI_COLOR_GREEN;
     debug_print_many(std::forward<Args>(args)...);
     std::cout << ANSI_COLOR_RESET;
 }
