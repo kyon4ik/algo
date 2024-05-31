@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
+#include <map>
+#include <set>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -66,14 +68,38 @@ void print(std::pair<T, U> const& value) {
 }
 
 template <class Rng> requires std::ranges::range<Rng>
+struct RangeFormat {
+    static const char obracket = '[';
+    static const char cbracket = ']';
+    static constexpr std::string separator = ", ";
+};
+
+template <class T>
+struct RangeFormat<std::set<T>> {
+    static const char obracket = '{';
+    static const char cbracket = '}';
+    static constexpr std::string separator = ", ";
+};
+
+template <class Key, class T>
+struct RangeFormat<std::map<Key, T>> {
+    static const char obracket = '{';
+    static const char cbracket = '}';
+    static constexpr std::string separator = ", ";
+};
+
+template <class Rng> requires std::ranges::range<Rng>
 void print(Rng&& rng) {
-    std::cout << '[';
+    std::cout << RangeFormat<Rng>::obracket;
+    if (std::cbegin(rng) == std::cend(rng)) {
+        return;
+    }
     print(*std::cbegin(rng));
     for (auto it = std::next(std::cbegin(rng)); it != std::cend(rng); ++it) {
-        std::cout << ", "; 
+        std::cout << RangeFormat<Rng>::separator; 
         print(*it); 
     }
-    std::cout << ']';
+    std::cout << RangeFormat<Rng>::cbracket;
 }
 
 template <class T>
