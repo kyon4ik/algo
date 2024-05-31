@@ -93,6 +93,9 @@ struct RangeFormat<std::map<Key, T>> {
 };
 
 template <class Rng> requires std::ranges::range<Rng>
+void print(Rng&& rng);
+
+template <class Rng> requires std::ranges::range<Rng>
 void print_range(Rng&& rng) {
     using Fmt = RangeFormat<std::decay_t<Rng>>;
     if (std::cbegin(rng) == std::cend(rng)) {
