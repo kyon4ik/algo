@@ -9,3 +9,7 @@ target_include_directories(sequence PRIVATE ../include)
 add_executable(sort sort.cpp)
 target_link_libraries(sort PRIVATE asan ubsan algo)
 target_include_directories(sort PRIVATE ../include)
+
+add_executable(trie trie.cpp)
+target_link_libraries(trie PRIVATE asan ubsan algo)
+target_include_directories(trie PRIVATE ../include)
