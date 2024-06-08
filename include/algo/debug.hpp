@@ -128,7 +128,6 @@ void debug_print_many(Args&&... args) {
     std::cout << std::fixed << std::setprecision(9);
     (println(std::forward<Args>(args)), ...); 
     std::cout.flags(old_flags);
-    std::cout.flush();
 }
 
 template <class ...Args>
@@ -138,6 +137,7 @@ void debug_impl(std::string const& funcname, size_t line, Args&&... args) {
     std::cout << ANSI_COLOR_GREEN;
     debug_print_many(std::forward<Args>(args)...);
     std::cout << ANSI_COLOR_RESET;
+    std::cout.flush();
 }
 
 }
