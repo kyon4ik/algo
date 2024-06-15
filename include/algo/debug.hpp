@@ -11,7 +11,6 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -25,26 +24,14 @@
 
 namespace algo {
 
-template <class Int> requires std::integral<Int>
-void print(Int value) {
-    std::cout << value;
-}
-
-template <class Float> requires std::floating_point<Float>
-void print(Float value) {
+template <typename T>
+void print(T const& value) {
     std::cout << value;
 }
 
 template <typename T>
-void print(std::complex<T> value) {
+void print(std::complex<T> const& value) {
     std::cout << value.real() << '+' << value.imag() << 'i';
-}
-
-void print(std::monostate) {}
-
-template <class T>
-void print(T const* value) {
-    std::cout << value;
 }
 
 template <class T>
@@ -93,10 +80,10 @@ struct RangeFormat<std::map<Key, T>> {
 };
 
 template <class Rng> requires std::ranges::range<Rng>
-void print(Rng&& rng);
+void print(Rng const& rng);
 
 template <class Rng> requires std::ranges::range<Rng>
-void print_range(Rng&& rng) {
+void print_range(Rng const& rng) {
     using Fmt = RangeFormat<std::decay_t<Rng>>;
     if (std::cbegin(rng) == std::cend(rng)) {
         return;
@@ -109,10 +96,10 @@ void print_range(Rng&& rng) {
 }
 
 template <class Rng> requires std::ranges::range<Rng>
-void print(Rng&& rng) {
+void print(Rng const& rng) {
     using Fmt = RangeFormat<std::decay_t<Rng>>;
     std::cout << Fmt::obracket;
-    print_range(std::forward<Rng>(rng));
+    print_range(rng);
     std::cout << Fmt::cbracket;
 }
 
