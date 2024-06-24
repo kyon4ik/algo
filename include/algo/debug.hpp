@@ -49,6 +49,9 @@ void print(std::bitset<N> const& value) {
     std::cout << "bits[" << value << ']';
 }
 
+template <class Rng> requires std::ranges::range<Rng>
+void print(Rng const& rng);
+
 template <class T, class U>
 void print(std::pair<T, U> const& value) {
     std::cout << '(';
@@ -78,9 +81,6 @@ struct RangeFormat<std::map<Key, T>> {
     static const char cbracket = '}';
     static inline const std::string separator = ", ";
 };
-
-template <class Rng> requires std::ranges::range<Rng>
-void print(Rng const& rng);
 
 template <class Rng> requires std::ranges::range<Rng>
 void print_range(Rng const& rng) {
